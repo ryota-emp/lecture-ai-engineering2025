@@ -1,0 +1,28 @@
+name: Branch Protection Rules
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  enforce-branch-protection:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Check branch name format
+      run: |
+        BRANCH_NAME=${GITHUB_HEAD_REF}
+        if ! echo $BRANCH_NAME | grep -E "^(feature|fix|refactor|chore)/[a-z0-9-]+$"; then
+          echo "Branch name '$BRANCH_NAME' does not follow the convention: (feature|fix|refactor|chore)/description-in-kebab-case"
+          exit 1
+        fi
+    
+    - name: Check commit messages
+      run: |
+        git log origin/main..HEAD --pretty=format:"%s" | while read commit_msg; do
+          if ! echo "$commit_msg" | grep -E "^(feat|fix|docs|style|refactor|perf|test|chore)(\([a-z0-9-]+\))?: .+$"; then
+            echo "Commit message '$commit_msg' does not follow the Conventional Commits format"
+            exit 1
+          fi
+        done
