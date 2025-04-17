@@ -176,3 +176,9 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Streamlit secrets
+secrets.toml
+
+# Database files
+chat_feedback.db
